@@ -28,6 +28,20 @@
 
 ---
 
+## 0. Método de Despliegue Activo
+
+| Campo | Valor |
+|-------|-------|
+| **Método** | Despliegue directo con Wrangler desde terminal |
+| **Agente responsable** | `cloudflare-wrangler-deploy` |
+| **CI/CD (GitHub Actions)** | No utilizado (disponible como referencia) |
+| **Fecha de decisión** | 2026-03-17 |
+| **Documento dedicado** | `.governance/metodo_despliegue.md` |
+
+> **Importante:** Este proyecto usa **despliegue directo con Wrangler desde terminal**. El agente responsable es `cloudflare-wrangler-deploy`. **No se utilizan GitHub Actions ni CI/CD de GitHub para despliegues.** Para más detalles, consultar `.governance/metodo_despliegue.md`.
+
+---
+
 ## 1. Resumen del Proyecto
 
 | Campo | Valor |
@@ -42,13 +56,18 @@
 
 ---
 
-## 2. GitHub Secrets (CI/CD)
+## 2. Secrets para Despliegue Directo
 
 | Secret | Uso | Consume | Estado |
 |--------|-----|---------|--------|
-| `CLOUDFLARE_API_TOKEN` | Token para API de Cloudflare | GitHub Actions / wrangler / GitHub Codespaces | ✅ |
-| `CLOUDFLARE_ACCOUNT_ID` | Identificador de cuenta para despliegues | GitHub Actions / wrangler / GitHub Codespaces | ✅ |
+| `CLOUDFLARE_API_TOKEN` | Token para API de Cloudflare | wrangler CLI / GitHub Codespaces | ✅ |
+| `CLOUDFLARE_ACCOUNT_ID` | Identificador de cuenta para despliegues | wrangler CLI / GitHub Codespaces | ✅ |
 | `[AGREGAR]` | [Descripción] | [Worker/Service] | 🔲 |
+
+> **Importante:** Este proyecto usa despliegue directo con Wrangler desde terminal. Los secrets se gestionan mediante:
+> - `wrangler secret put` para secrets remotos (producción)
+> - GitHub Codespaces Secrets para entorno de desarrollo en Codespaces
+> - **No se usa GitHub Actions ni CI/CD de GitHub para despliegues**
 
 > **Nota:** Los valores de secrets nunca se documentan en este archivo. Usar `wrangler secret put` para gestión local.
 
@@ -142,11 +161,16 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Uso de Wrangler** | [Sí/No] |
-| **Archivo de configuración** | [wrangler.toml / wrangler.jsonc] |
-| **Método de autenticación** | [GitHub Actions + wrangler-action / wrangler login / Manual] |
-| **Environments configurados** | [dev, staging, production] |
+| **Método de despliegue activo** | Despliegue directo con Wrangler desde terminal |
+| **Agente responsable** | `cloudflare-wrangler-deploy` |
+| **CI/CD automatizado** | No utilizado |
+| **Uso de Wrangler** | Sí |
+| **Archivo de configuración** | wrangler.toml / wrangler.jsonc |
+| **Método de autenticación** | `wrangler login` (interactivo) |
+| **Environments configurados** | dev, production |
 | **account_id** | No documentado (resolver vía login) |
+
+> **Importante:** Este proyecto usa **despliegue directo con Wrangler desde terminal**. El agente responsable es `cloudflare-wrangler-deploy`. **No se utilizan GitHub Actions ni CI/CD de GitHub para despliegues.**
 
 ### 5.1 Bindings y Variables de Entorno (wrangler)
 
@@ -282,7 +306,7 @@ wrangler secret put [SECRET_NAME] --env [dev/staging]
 - Configuración de CORS para orígenes permitidos
 - Límites de rate limiting para la API
 - Servicios opcionales a habilitar (auth, queues, vectorize, workflows)
-- Configuración de CI/CD y GitHub Secrets
+- Configuración de autenticación Wrangler para todos los desarrolladores
 
 ---
 
@@ -290,6 +314,7 @@ wrangler secret put [SECRET_NAME] --env [dev/staging]
 
 | Fecha | Cambio | Responsable | Aprobado Por |
 |-------|--------|-------------|--------------|
+| 2026-03-17 | Separación de agente wrangler: `cloudflare-wrangler-actions` (CI/CD) y `cloudflare-wrangler-deploy` (terminal directo). Añadida Sección 0 (Método de Despliegue) y archivo `.governance/metodo_despliegue.md` | orquestador | Usuario |
 | 2026-03-17 | Actualización de recursos: GitHub Secrets (CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN), KV Namespace (secrets-api-inmo), OPENAI_API_KEY en KV, R2 Bucket (r2-almacen) con directorio dir-api-inmo/, Cloudflare Pages (cb-consulting) | inventariador | Usuario |
 
 ---

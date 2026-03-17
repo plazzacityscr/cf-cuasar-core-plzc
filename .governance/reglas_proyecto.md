@@ -105,6 +105,21 @@ Las aplicaciones que sirven a frontends deben respetar CORS.
 - Evitar incluir `account_id` en archivos versionados; el CLI debe resolverlo mediante login.
 - Declarar bindings de bases de datos, buckets, colas, etc., con los nombres acordados en `inventario_recursos.md`.
 - Variables de entorno sensibles van en archivos discretos por entorno, no versionados.
+- El método de despliegue activo debe estar documentado en `inventario_recursos.md` (Sección 0) y `.governance/metodo_despliegue.md`.
+
+---
+
+### R8.b — Método de despliegue explícito
+
+**Prioridad:** Crítica
+
+- El método de despliegue activo del proyecto debe estar **explícitamente definido** en `inventario_recursos.md` (Sección 0) y `.governance/metodo_despliegue.md`.
+- El agente responsable del despliegue debe estar **inequívocamente identificado**.
+- No debe haber ambigüedad sobre qué agente usar para desplegar.
+- Métodos posibles:
+  - **Despliegue directo:** `cloudflare-wrangler-deploy` (terminal, Codespaces)
+  - **CI/CD automatizado:** `cloudflare-wrangler-actions` (GitHub Actions)
+- El método puede variar entre proyectos; cada proyecto debe documentar el suyo.
 
 ---
 

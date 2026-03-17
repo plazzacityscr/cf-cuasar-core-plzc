@@ -22,7 +22,8 @@ Todos los agentes ejecutores deben consultar antes de iniciar cualquier acción:
 | [`cloudflare-kv`](cloudflare-kv.md) | Almacenamiento clave-valor, caché, sesiones, TTL |
 | [`cloudflare-ai`](cloudflare-ai.md) | Workers AI, inferencia, AI SDK |
 | [`cloudflare-workflows`](cloudflare-workflows.md) | Workflows de Cloudflare, orquestación de procesos |
-| [`cloudflare-wrangler`](cloudflare-wrangler.md) | Configuración Wrangler, CI/CD, despliegues, GitHub Actions |
+| [`cloudflare-wrangler-actions`](cloudflare-wrangler-actions.md) | Configuración Wrangler para CI/CD, GitHub Actions, wrangler-action |
+| [`cloudflare-wrangler-deploy`](cloudflare-wrangler-deploy.md) | Despliegue directo con Wrangler desde terminal/Codespaces |
 
 ### Frontend
 

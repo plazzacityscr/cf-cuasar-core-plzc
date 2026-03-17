@@ -231,7 +231,8 @@ Solo puedes delegar en estos agentes personalizados del proyecto:
 | `cloudflare-vectorize` | Diseña e implementa Vectorize (embeddings, búsqueda semántica) |
 | `cloudflare-queues` | Diseña e implementa Queues (productores, consumidores) |
 | `cloudflare-workflows` | Diseña e implementa Workflows de Cloudflare (orquestación de procesos) |
-| `cloudflare-infra` | Gestiona configuración de Wrangler, despliegues y recursos Cloudflare |
+| `cloudflare-wrangler-actions` | Gestiona CI/CD con GitHub Actions, wrangler-action, workflows |
+| `cloudflare-wrangler-deploy` | Gestiona despliegue directo con Wrangler desde terminal/Codespaces |
 | `frontend-react` | Diseña e implementa componentes React con shadcn/ui |
 | `frontend-ui` | Diseña e implementa interfaces de usuario, layouts, navegación |
 | `code-validator` | Valida calidad (lint, typecheck, tests) y cumplimiento de reglas |
@@ -253,12 +254,24 @@ Solo puedes delegar en estos agentes personalizados del proyecto:
 
 ---
 
-### Usa `cloudflare-infra` cuando:
+### Usa `cloudflare-wrangler-actions` cuando:
 
-- La tarea afecte a incorporación, configuración o actualización de Wrangler
-- Haya cambios de despliegue, bindings o configuración de Cloudflare
-- Se requiera crear o modificar recursos Cloudflare (D1, KV, R2, etc.)
-- Haya que gestionar integración con GitHub Secrets para despliegue
+- La tarea afecte a CI/CD con GitHub Actions
+- Haya que configurar o modificar workflows en `.github/workflows/`
+- Se requiera integrar `cloudflare/wrangler-action@v3`
+- Haya que gestionar GitHub Secrets para despliegue automatizado
+- Se necesite configurar environments de GitHub (dev, staging, production)
+
+---
+
+### Usa `cloudflare-wrangler-deploy` cuando:
+
+- La tarea sea despliegue directo desde terminal o Codespaces
+- Haya que ejecutar `wrangler deploy`, `wrangler deploy --env [environment]`
+- Se requiera autenticación con `wrangler login`
+- Haya que gestionar secrets con `wrangler secret put`
+- Se necesite validar despliegue con `wrangler tail`, `wrangler status`
+- La tarea afecte a configuración de Wrangler (`wrangler.toml`, `wrangler.jsonc`) para despliegue directo
 
 ---
 

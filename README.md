@@ -118,7 +118,8 @@ Un **sistema completo de agentes de IA coordinados** para gestionar el desarroll
 │       ├── cloudflare-r2.md         # R2, buckets
 │       ├── cloudflare-ai.md         # Workers AI
 │       ├── cloudflare-workflows.md  # Workflows
-│       ├── cloudflare-wrangler.md   # Wrangler, CI/CD
+│       ├── cloudflare-wrangler-actions.md  # Wrangler, CI/CD, GitHub Actions
+│       ├── cloudflare-wrangler-deploy.md   # Wrangler, despliegue directo desde terminal
 │       ├── frontend-react.md        # React, shadcn/ui
 │       ├── code-validator.md        # Validación de calidad
 │       └── natural-language-interpreter.md
@@ -222,7 +223,8 @@ Consulta [`reglas_proyecto.md`](.governance/reglas_proyecto.md) para las 16 regl
 | [`cloudflare-r2`](.agents/ejecutores/cloudflare-r2.md) | R2, buckets, acceso público/privado |
 | [`cloudflare-ai`](.agents/ejecutores/cloudflare-ai.md) | Workers AI, inferencia |
 | [`cloudflare-workflows`](.agents/ejecutores/cloudflare-workflows.md) | Workflows de Cloudflare |
-| [`cloudflare-wrangler`](.agents/ejecutores/cloudflare-wrangler.md) | Wrangler, CI/CD, despliegues |
+| [`cloudflare-wrangler-actions`](.agents/ejecutores/cloudflare-wrangler-actions.md) | Wrangler, CI/CD, GitHub Actions |
+| [`cloudflare-wrangler-deploy`](.agents/ejecutores/cloudflare-wrangler-deploy.md) | Wrangler, despliegue directo desde terminal |
 
 ### Agentes Ejecutores (Frontend y Soporte)
 
