@@ -488,6 +488,329 @@ Local comercial en zona de expansión...
 
 ---
 
+### 4. Instrucciones
+
+#### 4.1 Listar Instrucciones
+
+**GET** `/api/v1/instrucciones`
+
+Lista todas las instrucciones disponibles en el sistema.
+
+**Query Parameters:**
+
+| Parámetro | Tipo | Obligatorio | Descripción |
+|-----------|-------|-------------|-------------|
+| `activa` | Boolean | No | Filtrar por estado activo |
+| `nombre` | String | No | Filtrar por nombre (búsqueda parcial) |
+
+**Response 200:**
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "nombre": "resumen_ejecutivo_inmueble",
+      "version": 1,
+      "activa": true,
+      "modelo": "gpt-5.2",
+      "temperatura": 0.7,
+      "maximo_tokens_salida": 4000,
+      "formato_salida": "markdown",
+      "tipo_entrada": "json",
+      "prompt_desarrollador": "Genera un resumen ejecutivo del inmueble...",
+      "notas": "Versión inicial",
+      "fecha_vigencia": "2026-03-18T00:00:00Z",
+      "fecha_creacion": "2026-03-18T10:00:00Z",
+      "fecha_actualizacion": "2026-03-18T10:00:00Z"
+    }
+  ]
+}
+```
+
+---
+
+#### 4.2 Obtener Instrucción
+
+**GET** `/api/v1/instrucciones/{id}`
+
+Obtiene los detalles de una instrucción específica.
+
+**Path Parameters:**
+
+| Parámetro | Tipo | Obligatorio | Descripción |
+|-----------|-------|-------------|-------------|
+| `id` | Integer | Sí | Identificador único de la instrucción |
+
+**Response 200:**
+
+```json
+{
+  "data": {
+    "id": 1,
+    "nombre": "resumen_ejecutivo_inmueble",
+    "version": 1,
+    "activa": true,
+    "modelo": "gpt-5.2",
+    "temperatura": 0.7,
+    "maximo_tokens_salida": 4000,
+    "formato_salida": "markdown",
+    "tipo_entrada": "json",
+    "prompt_desarrollador": "Genera un resumen ejecutivo del inmueble...",
+    "notas": "Versión inicial",
+    "fecha_vigencia": "2026-03-18T00:00:00Z",
+    "fecha_creacion": "2026-03-18T10:00:00Z",
+    "fecha_actualizacion": "2026-03-18T10:00:00Z"
+  }
+}
+```
+
+**Response 404:**
+
+```json
+{
+  "error": "Instrucción no encontrada"
+}
+```
+
+---
+
+#### 4.3 Crear Instrucción
+
+**POST** `/api/v1/instrucciones`
+
+Crea una nueva instrucción en el sistema.
+
+**Request Body:**
+
+```json
+{
+  "nombre": "resumen_ejecutivo_inmueble",
+  "version": 1,
+  "activa": true,
+  "modelo": "gpt-5.2",
+  "temperatura": 0.7,
+  "maximo_tokens_salida": 4000,
+  "formato_salida": "markdown",
+  "tipo_entrada": "json",
+  "prompt_desarrollador": "Genera un resumen ejecutivo del inmueble...",
+  "notas": "Versión inicial",
+  "fecha_vigencia": "2026-03-18T00:00:00Z"
+}
+```
+
+| Campo | Tipo | Obligatorio | Descripción |
+|-------|-------|-------------|-------------|
+| `nombre` | String | Sí | Nombre descriptivo de la instrucción |
+| `version` | Integer | Sí | Versión de la instrucción |
+| `activa` | Boolean | Sí | Indica si la instrucción está activa |
+| `modelo` | String | Sí | Modelo de OpenAI a utilizar (ej: gpt-5.2) |
+| `temperatura` | Float | Sí | Temperatura para la generación (0.0-2.0) |
+| `maximo_tokens_salida` | Integer | Sí | Máximo de tokens de salida |
+| `formato_salida` | String | Sí | Formato de salida esperado (ej: markdown) |
+| `tipo_entrada` | String | Sí | Tipo de entrada (json o json_mas_markdown) |
+| `prompt_desarrollador` | Text | Sí | Texto completo de la instrucción |
+| `notas` | String | No | Notas sobre cambios o ajustes |
+| `fecha_vigencia` | String | Sí | Fecha de vigencia de la configuración (ISO 8601) |
+
+**Response 201:**
+
+```json
+{
+  "data": {
+    "id": 1,
+    "nombre": "resumen_ejecutivo_inmueble",
+    "version": 1,
+    "activa": true,
+    "modelo": "gpt-5.2",
+    "temperatura": 0.7,
+    "maximo_tokens_salida": 4000,
+    "formato_salida": "markdown",
+    "tipo_entrada": "json",
+    "prompt_desarrollador": "Genera un resumen ejecutivo del inmueble...",
+    "notas": "Versión inicial",
+    "fecha_vigencia": "2026-03-18T00:00:00Z",
+    "fecha_creacion": "2026-03-18T10:00:00Z",
+    "fecha_actualizacion": "2026-03-18T10:00:00Z"
+  }
+}
+```
+
+**Response 400 (ValidationError):**
+
+```json
+{
+  "error": "Error de validación",
+  "detalles": [
+    {
+      "campo": "nombre",
+      "mensaje": "El nombre es obligatorio"
+    }
+  ]
+}
+```
+
+---
+
+#### 4.4 Actualizar Instrucción
+
+**PUT** `/api/v1/instrucciones/{id}`
+
+Actualiza una instrucción existente.
+
+**Path Parameters:**
+
+| Parámetro | Tipo | Obligatorio | Descripción |
+|-----------|-------|-------------|-------------|
+| `id` | Integer | Sí | Identificador único de la instrucción |
+
+**Request Body:**
+
+```json
+{
+  "nombre": "resumen_ejecutivo_inmueble_v2",
+  "version": 2,
+  "activa": true,
+  "modelo": "gpt-5.2",
+  "temperatura": 0.8,
+  "maximo_tokens_salida": 4000,
+  "formato_salida": "markdown",
+  "tipo_entrada": "json",
+  "prompt_desarrollador": "Genera un resumen ejecutivo mejorado del inmueble...",
+  "notas": "Actualización para mejorar calidad",
+  "fecha_vigencia": "2026-03-20T00:00:00Z"
+}
+```
+
+**Response 200:**
+
+```json
+{
+  "data": {
+    "id": 1,
+    "nombre": "resumen_ejecutivo_inmueble_v2",
+    "version": 2,
+    "activa": true,
+    "modelo": "gpt-5.2",
+    "temperatura": 0.8,
+    "maximo_tokens_salida": 4000,
+    "formato_salida": "markdown",
+    "tipo_entrada": "json",
+    "prompt_desarrollador": "Genera un resumen ejecutivo mejorado del inmueble...",
+    "notas": "Actualización para mejorar calidad",
+    "fecha_vigencia": "2026-03-20T00:00:00Z",
+    "fecha_creacion": "2026-03-18T10:00:00Z",
+    "fecha_actualizacion": "2026-03-19T10:00:00Z"
+  }
+}
+```
+
+**Response 404:**
+
+```json
+{
+  "error": "Instrucción no encontrada"
+}
+```
+
+---
+
+#### 4.5 Eliminar Instrucción
+
+**DELETE** `/api/v1/instrucciones/{id}`
+
+Elimina una instrucción del sistema.
+
+**Path Parameters:**
+
+| Parámetro | Tipo | Obligatorio | Descripción |
+|-----------|-------|-------------|-------------|
+| `id` | Integer | Sí | Identificador único de la instrucción |
+
+**Response 204:** No content (eliminado exitosamente)
+
+**Response 404:**
+
+```json
+{
+  "error": "Instrucción no encontrada"
+}
+```
+
+---
+
+## Integración con OpenAI
+
+### Responses API
+
+El sistema utiliza la **Responses API** de OpenAI para generar los informes Markdown del workflow de análisis inmobiliario.
+
+#### Configuración
+
+| Parámetro | Valor |
+|-----------|-------|
+| **Endpoint** | `POST /v1/responses` |
+| **Modelo** | `gpt-5.2` |
+| **max_tokens** | 4000 |
+| **temperature** | 0.7 |
+| **Workflow** | `wk-proceso-inmo` |
+
+#### Estructura de la Petición
+
+```json
+{
+  "model": "gpt-5.2",
+  "instructions": "Texto de la instrucción desde ani_instrucciones",
+  "input": {
+    "i_json": { ... },
+    "markdown_previos": [ ... ]  // Solo para pasos 7-9
+  },
+  "max_tokens": 4000,
+  "temperature": 0.7
+}
+```
+
+#### Parámetros por Paso
+
+| Paso | Tipo Entrada | Input |
+|------|--------------|-------|
+| 1-6 | `json` | Solo I-JSON del proyecto |
+| 7-9 | `json_mas_markdown` | I-JSON + Markdown de pasos 1-4 |
+
+#### Manejo de Errores
+
+Los errores de OpenAI API se registran en `log.txt` en R2 con:
+- Fecha y hora del error
+- Paso del workflow
+- Mensaje de error
+- Petición cruda enviada a OpenAI
+- Respuesta cruda recibida de OpenAI
+
+---
+
+## Modelo de Datos
+
+### Tabla: ani_instrucciones
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `id` | INTEGER PRIMARY KEY | Identificador único de la instrucción |
+| `nombre` | TEXT | Nombre de la instrucción (ej: "resumen_ejecutivo_inmueble") |
+| `version` | INTEGER | Versión de la instrucción |
+| `activa` | BOOLEAN | Estado activo de la instrucción |
+| `modelo` | TEXT | Modelo de OpenAI a usar (ej: "gpt-5.2") |
+| `temperatura` | REAL | Temperatura para la respuesta (ej: 0.7) |
+| `maximo_tokens_salida` | INTEGER | Máximo de tokens de salida (ej: 4000) |
+| `formato_salida` | TEXT | Formato de salida (ej: "markdown") |
+| `tipo_entrada` | TEXT | Tipo de entrada (ej: "json", "json_mas_markdown") |
+| `prompt_desarrollador` | TEXT | Texto del prompt desarrollador |
+| `notas` | TEXT | Notas de cambio |
+| `fecha_vigencia` | TEXT | Fecha de vigencia de la instrucción |
+| `fecha_creacion` | TEXT | Fecha de creación de la instrucción |
+| `fecha_actualizacion` | TEXT | Fecha de última actualización |
+
+---
+
 ## Tipos de Datos
 
 ### Estado del Proyecto

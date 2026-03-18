@@ -1,0 +1,29 @@
+# Wrangler configuration for VaaIA - Workflow Worker
+# Workflow Worker: wk-proceso-inmo
+
+# =============================================================================
+# Workflow Worker Configuration
+# =============================================================================
+name = "wk-proceso-inmo"
+main = "src/workers/workflow/index.ts"
+compatibility_date = "2024-01-01"
+
+# Bindings for Workflow Worker
+[[kv_namespaces]]
+binding = "CF_B_KV_SECRETS"
+id = "b9e80742f2a74d89b3e9083245b35709"
+
+[[d1_databases]]
+binding = "CF_B_DB-INMO"
+database_name = "db-inmo"
+database_id = "871d7b6b-39b0-404b-9066-1ba1a7b8f50a"
+
+[[r2_buckets]]
+binding = "CF_B_R2_INMO"
+bucket_name = "r2-almacen"
+
+# Workflows
+[[workflows]]
+binding = "ANALYSIS_WORKFLOW"
+name = "analysis-workflow"
+class_name = "AnalysisWorkflow"

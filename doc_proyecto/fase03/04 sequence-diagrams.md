@@ -1,9 +1,10 @@
 # Diagramas de Secuencia
 
-> **Documento:** FASE 3 — Diseño  
-> **Fuente principal:** [`02 api-contract.md`](../fase02/02%20api-contract.md)  
-> **Versión:** 1.0  
+> **Documento:** FASE 3 — Diseño
+> **Fuente principal:** [`02 api-contract.md`](../fase02/02%20api-contract.md)
+> **Versión:** 1.1
 > **Fecha:** 2026-03-18
+> **Cambio:** Actualizados diagramas para reflejar integración con OpenAI Responses API usando Cloudflare Workflows
 
 ---
 
@@ -22,7 +23,8 @@ sequenceDiagram
     participant WF as Workflow Worker
     participant D1 as D1 Database
     participant R2 as R2 Storage
-    participant OAI as OpenAI API
+    participant KV as KV Secrets
+    participant OAI as OpenAI Responses API
 ```
 
 ---
@@ -65,15 +67,21 @@ sequenceDiagram
                 API->>D1: UPDATE ani_proyectos<br/SET estado='procesando_analisis', fecha_analisis_inicio=NOW()
                 D1-->>API: Proyecto actualizado
                 API-->>UI: 200 OK<br/with ejecucion_id
-                API->>WF: Iniciar workflow<br/with proyecto_id, ejecucion_id
+                API->>WF: Iniciar workflow wk-proceso-inmo<br/with proyecto_id, ejecucion_id
                 WF->>WF: Crear 9 pasos en estado 'pendiente'
                 WF-->>API: Workflow iniciado<br/with ejecucion details
                 loop Para cada paso (1-9)
                     WF->>WF: Actualizar estado paso a 'en_ejecucion'
                     WF->>D1: UPDATE ani_pasos<br/SET estado='en_ejecucion', fecha_inicio=NOW()
+                    WF->>D1: SELECT FROM ani_instrucciones<br/WHERE tipo = tipo_paso AND activa = true
+                    D1-->>WF: Instrucción obtenida<br/with modelo, temperatura, prompt
                     WF->>R2: GET {proyecto_id}.json<br/from R2
                     R2-->>WF: I-JSON obtenido
-                    WF->>OAI: POST /v1/chat/completions<br/with prompt + I-JSON
+                    alt Paso 7-9 (requiere Markdown previos)
+                        WF->>R2: GET {tipo_paso_previo}.md<br/from R2
+                        R2-->>WF: Markdown previos obtenidos
+                    end
+                    WF->>OAI: POST /v1/responses<br/with instructions + input<br/>model=gpt-5.2, max_tokens=4000, temperature=0.7
                     alt OpenAI API success
                         OAI-->>WF: Markdown generado
                         WF->>R2: PUT {tipo_paso}.md<br/with Markdown content
@@ -141,9 +149,11 @@ sequenceDiagram
 sequenceDiagram
     WF->>WF: Ejecutar paso {tipo_paso}
     WF->>D1: UPDATE ani_pasos<br/SET estado='en_ejecucion', fecha_inicio=NOW()
+    WF->>D1: SELECT FROM ani_instrucciones<br/WHERE tipo = tipo_paso AND activa = true
+    D1-->>WF: Instrucción obtenida<br/with modelo, temperatura, prompt
     WF->>R2: GET {proyecto_id}.json
     R2-->>WF: I-JSON obtenido
-    WF->>OAI: POST /v1/chat/completions<br/with prompt + I-JSON
+    WF->>OAI: POST /v1/responses<br/with instructions + input<br/>model=gpt-5.2, max_tokens=4000, temperature=0.7
     alt OpenAI API timeout
         OAI--xWF: Timeout
         WF->>R2: APPEND log.txt<br/>"Error: Timeout en OpenAI API"
@@ -215,6 +225,60 @@ sequenceDiagram
 
 ---
 
+## Secuencia 8: Integración con OpenAI Responses API
+
+```mermaid
+sequenceDiagram
+    participant WF as Workflow Worker
+    participant D1 as D1 Database
+    participant KV as KV Secrets
+    participant R2 as R2 Storage
+    participant OAI as OpenAI Responses API
+
+    Note over WF: Paso {tipo_paso} del workflow wk-proceso-inmo
+    
+    WF->>D1: SELECT FROM ani_instrucciones<br/>WHERE tipo = tipo_paso AND activa = true
+    D1-->>WF: Instrucción obtenida<br/>with modelo, temperatura, prompt_desarrollador
+    
+    WF->>R2: GET {proyecto_id}.json<br/>from R2
+    R2-->>WF: I-JSON obtenido
+    
+    alt Paso 7-9 (requiere Markdown previos)
+        WF->>R2: GET resumen.md<br/>from R2
+        R2-->>WF: Markdown resumen obtenido
+        WF->>R2: GET datos_clave.md<br/>from R2
+        R2-->>WF: Markdown datos_clave obtenido
+        WF->>R2: GET activo_fisico.md<br/>from R2
+        R2-->>WF: Markdown activo_fisico obtenido
+        WF->>R2: GET activo_estrategico.md<br/>from R2
+        R2-->>WF: Markdown activo_estrategico obtenido
+    end
+    
+    WF->>KV: GET OPENAI_API_KEY<br/>from secrets-api-inmo
+    KV-->>WF: API Key obtenida
+    
+    alt Paso 1-6 (solo JSON como input)
+        WF->>OAI: POST /v1/responses<br/>with instructions + input<br/>model=gpt-5.2, max_tokens=4000, temperature=0.7<br/>input={I-JSON}
+    else Paso 7-9 (JSON + Markdown previos)
+        WF->>OAI: POST /v1/responses<br/>with instructions + input<br/>model=gpt-5.2, max_tokens=4000, temperature=0.7<br/>input={I-JSON + Markdown previos}
+    end
+    
+    alt OpenAI API success
+        OAI-->>WF: Markdown generado<br/>format=markdown
+        WF->>R2: PUT {tipo_paso}.md<br/>with Markdown content
+        R2-->>WF: Archivo almacenado<br/>with ruta_archivo_r2
+        WF->>D1: UPDATE ani_pasos<br/>SET estado='correcto', fecha_fin=NOW(), ruta_archivo_r2
+    else OpenAI API error
+        OAI--xWF: Error<br/>with error details
+        WF->>R2: APPEND log.txt<br/>with error details + request/response
+        R2-->>WF: Log actualizado
+        WF->>D1: UPDATE ani_pasos<br/>SET estado='error', fecha_fin=NOW(), error_mensaje
+        WF->>D1: UPDATE ani_ejecuciones<br/>SET estado='finalizada_con_error', fecha_fin=NOW(), error_mensaje
+    end
+```
+
+---
+
 ## Leyenda de Componentes
 
 | Componente | Descripción |
@@ -222,9 +286,10 @@ sequenceDiagram
 | **Frontend** | Interfaz web (React) que interactúa con el usuario |
 | **API Worker** | Worker de Cloudflare que expone endpoints REST |
 | **Workflow Worker** | Cloudflare Workflow que ejecuta el análisis secuencial |
-| **D1 Database** | Base de datos SQLite de Cloudflare para persistencia |
-| **R2 Storage** | Almacenamiento de objetos de Cloudflare para archivos |
-| **OpenAI API** | API de inferencia con IA para generar informes |
+| **D1 Database** | Base de datos SQLite de Cloudflare para persistencia (proyectos, ejecuciones, pasos, instrucciones) |
+| **R2 Storage** | Almacenamiento de objetos de Cloudflare para archivos (I-JSON, informes Markdown, logs) |
+| **KV Secrets** | Almacenamiento de claves-valor de Cloudflare para secrets (OPENAI_API_KEY) |
+| **OpenAI Responses API** | API de inferencia con IA para generar informes (model=gpt-5.2, max_tokens=4000, temperature=0.7) |
 
 ---
 
@@ -239,4 +304,4 @@ sequenceDiagram
 
 ---
 
-> **Nota:** Estos diagramas de secuencia están basados en [`01 feature-workflow-analisis.spec.md`](../fase02/01%20feature-workflow-analisis.spec.md), [`02 api-contract.md`](../fase02/02%20api-contract.md) y [`03 domain-model.md`](../fase02/03%20domain-model.md) como fuentes principales.
+> **Nota:** Estos diagramas de secuencia están basados en [`01 feature-workflow-analisis.spec.md`](../fase02/01%20feature-workflow-analisis.spec.md), [`02 api-contract.md`](../fase02/02%20api-contract.md), [`03 domain-model.md`](../fase02/03%20domain-model.md) y [`01 architecture.md`](./01%20architecture.md) como fuentes principales. Actualizados para reflejar la integración con OpenAI Responses API usando Cloudflare Workflows (workflow: wk-proceso-inmo, modelo: gpt-5.2, max_tokens: 4000, temperature: 0.7).

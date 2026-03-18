@@ -125,7 +125,7 @@ graph TB
 
 **Responsabilidad:** Ejecutar el workflow secuencial de 9 pasos de análisis, llamando a OpenAI API para cada paso.
 
-**Tecnología:** Cloudflare Workflows
+**Tecnología:** Cloudflare Workflows con Responses API de OpenAI
 
 **Pasos del Workflow:**
 1. Resumen del inmueble
@@ -135,16 +135,37 @@ graph TB
 5. Análisis financiero
 6. Análisis regulatorio
 7. Lectura para inversor
-8. Lectura para emprendedor/operador
+8. Lectura para emprendedor
 9. Lectura para propietario
+
+**Integración con OpenAI:**
+- **API:** Responses API de OpenAI (recomendado por OpenAI para nuevos proyectos)
+- **Modelo:** gpt-5.2
+- **max_tokens:** 4000
+- **temperature:** 0.7
+
+**Configuración de Instrucciones:**
+- Las instrucciones se almacenan en la tabla `ani_instrucciones` en D1
+- Cada instrucción incluye: modelo, temperatura, prompt desarrollador, tipo de entrada
+- Las instrucciones son configurables sin redeploy del Worker
+
+**Almacenamiento de Resultados:**
+- El I-JSON original se almacena en R2
+- Los informes Markdown generados se almacenan en R2
+- Los logs de auditoría (petición/respuesta cruda) se almacenan en R2
 
 **Responsabilidades:**
 - Ejecutar pasos secuencialmente mediante `step.do()`
 - Llamar a OpenAI API con el prompt correspondiente
 - Generar informes Markdown
-- Almacenar informes en R2
+- Almacenar resultados en R2
 - Gestionar estados de ejecución y pasos
 - Manejar errores y detener el workflow si es necesario
+
+**Bindings:**
+- D1: `CF_B_DB-INMO` (para ejecuciones, pasos, instrucciones)
+- R2: `CF_B_R2_INMO` (para I-JSON, informes, logs)
+- KV: `CF_B_KV_SECRETS` (para OPENAI_API_KEY)
 
 ---
 
@@ -223,9 +244,15 @@ r2-almacen/dir-api-inmo/{proyecto_id}/
 **Responsabilidad:** Servicios externos integrados en el sistema.
 
 **OpenAI API:**
-- Proporciona capacidades de inferencia con IA
-- Utilizada para generar los informes Markdown
-- Accesada mediante API key almacenada en KV
+- **Propósito:** Inferencia con IA para generar informes de análisis
+- **API utilizada:** Responses API de OpenAI (recomendado por OpenAI para nuevos proyectos)
+- **Modelo:** gpt-5.2
+- **Autenticación:** API Key almacenada en KV namespace `secrets-api-inmo`
+- **Método de integración:** Llamadas desde Cloudflare Workflows
+- **Parámetros:**
+  - max_tokens: 4000
+  - temperature: 0.7
+  - Formato de respuesta: Markdown
 
 ---
 
@@ -493,10 +520,26 @@ graph LR
 **Decisión:** Utilizar Cloudflare Workflows para la ejecución del workflow de análisis.
 
 **Justificación:**
-- Proporciona orquestación nativa de pasos secuenciales
-- Manejo automático de estados y reintentos
-- Integración directa con D1 y R2
-- Mejor trazabilidad que implementación manual
+- Orquestación nativa de pasos secuenciales con reintentos automáticos
+- Manejo automático de estados y persistencia
+- Cada paso es autocontenido e idempotente
+- Mejor integración con la plataforma Cloudflare
+
+**Integración con OpenAI:**
+- **API:** Responses API de OpenAI (recomendado por OpenAI para nuevos proyectos)
+- **Modelo:** gpt-5.2
+- **max_tokens:** 4000
+- **temperature:** 0.7
+
+**Configuración de Instrucciones:**
+- Las instrucciones se almacenan en la tabla `ani_instrucciones` en D1
+- Cada instrucción incluye: modelo, temperatura, prompt desarrollador, tipo de entrada
+- Las instrucciones son configurables sin redeploy del Worker
+
+**Almacenamiento de Resultados:**
+- El I-JSON original se almacena en R2
+- Los informes Markdown generados se almacenan en R2
+- Los logs de auditoría (petición/respuesta cruda) se almacenan en R2
 
 ### DT-02: Almacenamiento de I-JSON en R2
 

@@ -122,9 +122,21 @@
 
 | Nombre | Binding | App | Estado |
 |--------|---------|-----|--------|
-| `r2-almacen` | [BINDING] | [Worker] | ✅ |
+| `r2-almacen` | `CF_B_R2_INMO` | `wk-api-inmo`, `wk-proceso-inmo` | ✅ |
 
-> **Nota:** Directorio creado: `dir-api-inmo/` dentro del bucket `r2-almacen`.
+**Estructura de almacenamiento en R2:**
+
+- **Ruta base:** `r2-almacen/dir-api-inmo/{proyecto_id}/`
+- **Archivos generados:**
+  - `resumen.md`
+  - `datos_clave.md`
+  - `activo_fisico.md`
+  - `activo_estrategico.md`
+  - `activo_financiero.md`
+  - `activo_regulado.md`
+  - `lectura_inversor.md`
+  - `lectura_emprendedor.md`
+  - `lectura_propietario.md`
 
 ### 4.5 Queues
 
@@ -136,7 +148,7 @@
 
 | Nombre | Binding | Clase | Worker Asociado | Estado |
 |--------|---------|-------|-----------------|--------|
-| `[WORKFLOW_NAME]` | [BINDING] | [CLASS_NAME] | [WORKER] | 🔲 |
+| `analysis-workflow` | `ANALYSIS_WORKFLOW` | `AnalysisWorkflow` | `wk-proceso-inmo` | 🔲 |
 
 ### 4.7 Workers AI
 
@@ -197,7 +209,7 @@
 
 | Servicio | Propósito | Variables Requeridas | Estado |
 |----------|-----------|---------------------|--------|
-| `[SERVICIO]` | [Descripción] | `[VAR_1, VAR_2]` | 🔲 |
+| OpenAI | Inferencia IA para análisis de proyectos inmobiliarios | `OPENAI_API_KEY` (almacenada en KV `secrets-api-inmo`) | ✅ |
 
 **Integraciones comunes (referencia):**
 
@@ -207,6 +219,13 @@
 | Anthropic | Inferencia IA | `ANTHROPIC_API_KEY` |
 | Clerk | Autenticación | `CLERK_SECRET_KEY`, `CLERK_PUBLISHABLE_KEY` |
 | Google | OAuth/IA | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` |
+
+**Configuración de OpenAI (Sprint 3):**
+
+- **API Endpoint:** `https://api.openai.com/v1/responses`
+- **Modelo:** `gpt-5.2`
+- **Almacenamiento de secret:** `OPENAI_API_KEY` en KV namespace `secrets-api-inmo`
+- **Implementación:** `src/workers/workflow/services/openai.service.ts`
 
 ---
 
@@ -317,6 +336,7 @@ wrangler secret put [SECRET_NAME] --env [dev/staging]
 
 | Fecha | Cambio | Responsable | Aprobado Por |
 |-------|--------|-------------|--------------|
+| 2026-03-18 | Sprint 3 completado: Cloudflare Workflow `analysis-workflow` configurado en worker `wk-proceso-inmo`. Archivos creados: `src/workers/workflow/index.ts` (AnalysisWorkflow), `src/workers/workflow/orchestration.ts`, `src/workers/workflow/services/workflow.service.ts`, `src/workers/workflow/services/openai.service.ts`. Integración con OpenAI Responses API implementada (endpoint: https://api.openai.com/v1/responses, modelo: gpt-5.2). Estructura de almacenamiento R2 documentada (9 archivos markdown por proyecto). Bindings del workflow worker: KV (secrets-api-inmo), D1 (db-inmo), R2 (r2-almacen). Validación typecheck exitosa sin errores de TypeScript | inventariador | Usuario |
 | 2026-03-18 | Sprint 1 completado: D1 Database `db-inmo` creada en Cloudflare con ID `871d7b6b-39b0-404b-9066-1ba1a7b8f50a`. Workers `wk-api-inmo` y `wk-proceso-inmo` configurados con bindings en wrangler.toml. Bindings actualizados: `CF_B_KV_SECRETS`, `CF_B_DB-INMO`, `CF_B_R2_INMO` | inventariador | Usuario |
 | 2026-03-18 | Actualización de nombres de recursos: Workers (`wk-api-inmo`, `wk-proceso-inmo`), D1 Database (`db-inmo`), Bindings (`CF_B_KV_SECRETS`, `CF_B_DB_INMO`, `CF_B_R2_INMO`) siguiendo convenciones de nomenclatura | inventariador | Usuario |
 | 2026-03-17 | Separación de agente wrangler: `cloudflare-wrangler-actions` (CI/CD) y `cloudflare-wrangler-deploy` (terminal directo). Añadida Sección 0 (Método de Despliegue) y archivo `.governance/metodo_despliegue.md` | orquestador | Usuario |

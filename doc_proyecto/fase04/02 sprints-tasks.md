@@ -475,16 +475,16 @@ Este documento descompone cada sprint en tareas específicas y ejecutables, prop
 
 **Especificaciones:**
 - Configuración en wrangler.toml:
-  - `name`: "vaaia-workflow-worker"
+  - `name`: "wk-proceso-inmo"
   - `main`: "src/workers/workflow/index.ts"
   - `compatibility_date`: "2024-01-01"
 - Bindings para Workflow Worker:
-  - D1 database: `vaaia-db`
-    - Binding name: `DB`
+  - D1 database: `db-inmo`
+    - Binding name: `CF_B_DB-INMO`
   - R2 bucket: `r2-almacen`
-    - Binding name: `STORAGE`
+    - Binding name: `CF_B_R2_INMO`
   - KV namespace: `secrets-api-inmo`
-    - Binding name: `SECRETS`
+    - Binding name: `CF_B_KV_SECRETS`
 - Workflows:
   - Nombre: `analysis-workflow`
   - Clase: `AnalysisWorkflow`
@@ -526,7 +526,18 @@ Este documento descompone cada sprint en tareas específicas y ejecutables, prop
   - Ejecutar pasos secuencialmente (1-9)
   - Manejar transiciones de estado
   - Detener workflow si algún paso falla
-  - Actualizar estado del proyecto
+- Integración con OpenAI:
+  - Recuperar OPENAI_API_KEY desde KV `secrets-api-inmo`
+  - Construir prompts específicos para cada tipo de paso
+  - Llamar a OpenAI Responses API con `POST /v1/responses`
+  - Parámetros: model=gpt-5.2, max_tokens=4000, temperature=0.7
+  - Manejar rate limiting y timeouts
+  - Implementar reintentos con backoff exponencial
+- Almacenamiento de resultados:
+  - Generar informes Markdown desde respuestas de OpenAI
+  - Almacenar informes en R2
+  - Almacenar logs de errores en R2
+  - Actualizar rutas en pasos de D1
 - Estados de paso:
   - `pendiente`: Awaiting execution
   - `en_ejecucion`: Currently executing
@@ -555,32 +566,22 @@ Este documento descompone cada sprint en tareas específicas y ejecutables, prop
 
 ### Tarea 3.3: Implementar Integración con OpenAI
 
-**Descripción:** Implementar la integración con OpenAI API para generación de informes.
+**Descripción:** Implementar la integración con OpenAI Responses API para generación de informes.
 
 **Especificaciones:**
-- Configuración:
-  - Recuperar OPENAI_API_KEY desde KV `secrets-api-inmo`
-  - Configurar modelo de OpenAI (ej: gpt-4o-mini)
-  - Configurar parámetros de API (max_tokens, temperature)
+- Endpoint de OpenAI: `POST /v1/responses`
+- Modelo: gpt-5.2
+- max_tokens: 4000
+- temperature: 0.7
 - Prompts:
   - Prompt específico para cada tipo de paso
   - I-JSON del inmueble como contexto
-  - Formato de respuesta esperado (Markdown)
+  - Formato de respuesta esperado: Markdown
 - Manejo de API:
   - Rate limiting con backoff exponencial
   - Reintentos automáticos con límite máximo
   - Timeout handling
   - Error handling robusto
-- Tipos de paso y prompts:
-  1. `resumen`: Prompt para resumen general
-  2. `datos_clave`: Prompt para datos clave
-  3. `activo_fisico`: Prompt para análisis físico
-  4. `activo_estrategico`: Prompt para análisis estratégico
-  5. `activo_financiero`: Prompt para análisis financiero
-  6. `activo_regulado`: Prompt para análisis regulatorio
-  7. `lectura_inversor`: Prompt para lectura inversor
-  8. `lectura_emprendedor`: Prompt para lectura emprendedor
-  9. `lectura_propietario`: Prompt para lectura propietario
 
 **Pasos:**
 1. Crear directorio src/workers/workflow/services/
@@ -605,22 +606,24 @@ Este documento descompone cada sprint en tareas específicas y ejecutables, prop
 
 ### Tarea 3.4: Implementar Almacenamiento de Resultados
 
-**Descripción:** Implementar almacenamiento de informes Markdown generados en R2 y actualización de rutas en D1.
+**Descripción:** Implementar almacenamiento de informes Markdown generados en R2.
 
 **Especificaciones:**
 - Estructura de almacenamiento en R2:
-  - `r2-almacen/dir-api-inmo/{proyecto_id}/`
-    - `{proyecto_id}.json`: I-JSON completo
-    - `resumen.md`: Informe de resumen
-    - `datos_clave.md`: Informe de datos clave
-    - `activo_fisico.md`: Informe de análisis físico
-    - `activo_estrategico.md`: Informe de análisis estratégico
-    - `activo_financiero.md`: Informe de análisis financiero
-    - `activo_regulado.md`: Informe de análisis regulatorio
-    - `lectura_inversor.md`: Informe de lectura inversor
-    - `lectura_emprendedor.md`: Informe de lectura emprendedor
-    - `lectura_propietario.md`: Informe de lectura propietario
-    - `log.txt`: Registro de errores
+  ```
+  r2-almacen/dir-api-inmo/{proyecto_id}/
+  ├── {proyecto_id}.json          # I-JSON completo (se conserva entre reejecuciones)
+  ├── resumen.md
+  ├── datos_clave.md
+  ├── activo_fisico.md
+  ├── activo_estrategico.md
+  ├── activo_financiero.md
+  ├── activo_regulado.md
+  ├── lectura_inversor.md
+  ├── lectura_emprendedor.md
+  ├── lectura_propietario.md
+  └── log.txt                      # Registro de errores si los hay
+  ```
 - Operaciones:
   - Upload: Subir informes Markdown
   - Download: Recuperar informes
@@ -660,9 +663,13 @@ Este documento descompone cada sprint en tareas específicas y ejecutables, prop
   - Capturar errores de cada paso
   - Actualizar estado de paso a 'error'
   - Actualizar estado de ejecución a 'finalizada_con_error'
-  - Actualizar estado de proyecto a 'analisis_con_error'
+  - Actualizar estado del proyecto a 'analisis_con_error'
   - Generar logs detallados en R2
   - Detener workflow inmediatamente ante error crítico
+- Idempotencia:
+  - Cada paso puede reintentarse
+  - Verificar si ya se generó la salida antes de volver a invocar OpenAI
+  - Escritura controlada en R2 o D1
 - Logging:
   - Loggear cada error con contexto completo
   - Incluir timestamp, tipo de error, mensaje
