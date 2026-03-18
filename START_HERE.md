@@ -42,9 +42,22 @@ Este proyecto utiliza un **sistema de agentes de IA coordinados** para gestionar
 
 ---
 
+## Métodos de Despliegue y Agentes
+
+Este sistema soporta **dos métodos de despliegue**:
+
+| Método | Agente Responsable | Descripción |
+|--------|-------------------|-------------|
+| **CI/CD** | `cloudflare-wrangler-actions` | Despliegue automatizado con GitHub Actions |
+| **Despliegue directo** | `cloudflare-wrangler-deploy` | Despliegue manual desde terminal o Codespaces |
+
+> **Nota:** Consulta `.governance/metodo_despliegue.md` para saber qué método está activo en este proyecto.
+
+---
+
 ## Cómo Empezar (En 3 pasos)
 
-### Paso 1: Autenticación
+### Paso 1: Autenticación y Pruebas de Conexión
 
 Primera vez, autentícate con Cloudflare:
 
@@ -52,11 +65,14 @@ Primera vez, autentícate con Cloudflare:
 npx wrangler login
 ```
 
-Verifica tu autenticación:
+Verifica tu autenticación con **dos pruebas disponibles**:
 
-```bash
-npx wrangler whoami
-```
+| Prueba | Comando | Qué verifica |
+|--------|---------|--------------|
+| **Rápida** | `npx wrangler whoami` | Autenticación básica |
+| **Completa** | `./scripts/cloudflare-connection-test.sh` | Crea y elimina recursos demo (Worker, KV, R2) |
+
+Ejecuta ambas para confirmar que tu configuración es correcta.
 
 ### Paso 2: Iniciar Sesión de Desarrollo
 
@@ -172,6 +188,7 @@ Si muestra tu cuenta, estás autenticado. Si no, ejecuta `npx wrangler login`.
 |-----------|-----------|
 | [Reglas completas (R1-R16)](/.governance/reglas_proyecto.md) | Todas las reglas obligatorias |
 | [Inventario de recursos](/.governance/inventario_recursos.md) | Recursos y configuración operativa |
+| [Método de Despliegue](/.governance/metodo_despliegue.md) | CI/CD vs despliegue directo |
 | [Agentes ejecutores](/.agents/ejecutores/README.md) | Agentes especializados por dominio |
 | [Skill Cloudflare Deploy](/.skills/cloudflare-deploy/SKILL.md) | Referencias técnicas de Cloudflare |
 | [Flujo de Autenticación](/.governance/AUTENTICACION.md) | Cómo autenticarse con Cloudflare |

@@ -226,6 +226,8 @@ Consulta [`reglas_proyecto.md`](.governance/reglas_proyecto.md) para las 16 regl
 | [`cloudflare-wrangler-actions`](.agents/ejecutores/cloudflare-wrangler-actions.md) | Wrangler, CI/CD, GitHub Actions |
 | [`cloudflare-wrangler-deploy`](.agents/ejecutores/cloudflare-wrangler-deploy.md) | Wrangler, despliegue directo desde terminal |
 
+> **Nota:** El sistema soporta **dos métodos de despliegue**: (1) **CI/CD** con GitHub Actions (agente `cloudflare-wrangler-actions`) y (2) **Despliegue directo** desde terminal (agente `cloudflare-wrangler-deploy`). Consulta `.governance/metodo_despliegue.md` para saber qué método está activo en este proyecto.
+
 ### Agentes Ejecutores (Frontend y Soporte)
 
 | Agente | Responsabilidad |
@@ -300,6 +302,20 @@ Configura estos secrets en tu repositorio:
 | `CLOUDFLARE_API_TOKEN` | Token de API con permisos Worker:Edit |
 | `CLOUDFLARE_ACCOUNT_ID` | ID de tu cuenta de Cloudflare |
 
+### Pruebas de Conexión
+
+Puedes verificar tu configuración con **dos pruebas**:
+
+1. **Prueba manual rápida** — Verifica autenticación básica:
+   ```bash
+   npx wrangler whoami
+   ```
+
+2. **Prueba completa automatizada** — Crea y elimina recursos demo (Worker, KV, R2):
+   ```bash
+   ./scripts/cloudflare-connection-test.sh
+   ```
+
 Más detalles en [`.governance/AUTENTICACION.md`](.governance/AUTENTICACION.md)
 
 ---
@@ -366,6 +382,15 @@ Si muestra tu cuenta, estás autenticado. Si no, ejecuta `npx wrangler login`.
 ### ¿Necesito todos los agentes ejecutores?
 
 **NO.** Usa solo los que necesites para tu proyecto. El orquestador trabajará con los agentes disponibles.
+
+### ¿Qué método de despliegue debo usar?
+
+El sistema soporta **dos métodos**:
+
+- **CI/CD con GitHub Actions** — Ideal para producción y equipos que buscan automatización completa
+- **Despliegue directo desde terminal** — Ideal para desarrollo rápido, pruebas o entornos personales
+
+Consulta `.governance/metodo_despliegue.md` para saber qué método está activo en este proyecto.
 
 ---
 
