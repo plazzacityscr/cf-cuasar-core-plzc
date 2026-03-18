@@ -85,7 +85,14 @@
 
 | Variable | Uso | Sensible | Estado |
 |----------|-----|----------|--------|
-| `[VAR_NAME]` | [Descripción del uso] | Sí | 🔲 |
+| `VITE_API_BASE_URL` | URL base de la API del backend | No | ✅ |
+| `VITE_PAGES_URL` | URL de Cloudflare Pages para el frontend | No | ✅ |
+| `VITE_CORS_ORIGINS` | Orígenes permitidos para CORS | No | ✅ |
+
+**Archivos de configuración:**
+- `src/frontend/.env` (desarrollo)
+- `src/frontend/.env.production` (producción)
+- `src/frontend/.env.example` (plantilla)
 
 > **Nota:** Usar `.dev.vars.example` y `.env.example` como plantillas versionadas sin valores reales.
 
@@ -168,6 +175,83 @@
 |----------|-----|--------------|---------------|--------|
 | `cb-consulting` | https://cb-consulting.pages.dev/ | [APP] | GitHub | ✅ |
 
+**Frontend React (Sprint 4):**
+
+| Campo | Valor |
+|-------|-------|
+| **Ubicación** | `src/frontend/` |
+| **Framework** | React 19.x |
+| **Build tool** | Vite 5.x |
+| **Styling** | Tailwind CSS 4.x |
+| **Router** | React Router 7.x |
+| **Configuración** | `vite.config.ts`, `tsconfig.json`, `tailwind.config.js` |
+
+**Estructura de directorios del frontend:**
+
+```
+src/frontend/
+├── src/
+│   ├── components/       # Componentes React
+│   │   ├── layout/       # MainLayout, Sidebar, Header
+│   │   ├── ui/           # Button, Input, Select, Textarea, Card, Table, Modal, Spinner, Badge, Alert
+│   │   ├── ui/form/      # FormGroup, FormLabel, FormError
+│   │   ├── projects/     # ProjectList, ProjectCard, ProjectForm, ProjectDetail, StatusBadge, ErrorMessage
+│   │   └── results/      # ResultsViewer, ReportTab, ReportLoading, ReportError
+│   ├── pages/            # Dashboard, ProjectsPage, CreateProjectPage, ProjectDetailPage, ResultsPage
+│   ├── services/         # projectService.ts, workflowService.ts, resultsService.ts
+│   ├── hooks/            # useProjects, useWorkflow, useResults, useApi, useTexts
+│   ├── config/           # texts.ts, errors.ts, validation.ts, navigation.ts, reports.ts
+│   ├── types/            # project.ts, workflow.ts, api.ts, components.ts
+│   ├── lib/              # apiClient.ts, queryClient.ts, queryProvider.tsx
+│   └── styles/           # globals.css
+├── public/               # Archivos estáticos
+├── .env                  # Variables de entorno (desarrollo)
+├── .env.production       # Variables de entorno (producción)
+├── .env.example          # Plantilla de variables de entorno
+├── index.html            # HTML entry point
+├── vite.config.ts        # Configuración Vite
+├── tsconfig.json         # Configuración TypeScript
+└── tailwind.config.js    # Configuración Tailwind CSS
+```
+
+**Componentes implementados:**
+
+- **Layout:** MainLayout, Sidebar, Header
+- **UI:** Button, Input, Select, Textarea, Card, Table, Modal, Spinner, Badge, Alert
+- **Form:** FormGroup, FormLabel, FormError
+- **Projects:** ProjectList, ProjectCard, ProjectForm, ProjectDetail, StatusBadge, ErrorMessage
+- **Results:** ResultsViewer, ReportTab, ReportLoading, ReportError
+
+**Páginas implementadas:**
+
+- Dashboard
+- ProjectsPage
+- CreateProjectPage
+- ProjectDetailPage
+- ResultsPage
+
+**Servicios implementados:**
+
+- projectService.ts
+- workflowService.ts
+- resultsService.ts
+
+**Hooks implementados:**
+
+- useProjects
+- useWorkflow
+- useResults
+- useApi
+- useTexts
+
+**Configuraciones implementadas:**
+
+- texts.ts (textos de la aplicación)
+- errors.ts (mensajes de error)
+- validation.ts (esquemas de validación Zod)
+- navigation.ts (configuración de navegación)
+- reports.ts (configuración de reportes)
+
 ---
 
 ## 5. Wrangler y Despliegue
@@ -241,16 +325,19 @@
 
 | Capa | Tecnología | Versión | Estado |
 |------|------------|---------|--------|
-| Lenguaje | TypeScript | [latest] | 🔲 |
-| Framework | Hono | [4.x] | 🔲 |
-| Frontend | React | [19.x] | 🔲 |
-| Build tool | Vite | [latest] | 🔲 |
-| UI Components | shadcn/ui | [latest] | 🔲 |
-| Styling | Tailwind CSS | [v4.x] | 🔲 |
-| Router | React Router | [v7] | 🔲 |
-| Testing | Vitest | [latest] | 🔲 |
-| Validación | Zod | [latest] | 🔲 |
-| IA (opcional) | AI SDK | [5.x] | 🔲 |
+| Lenguaje | TypeScript | 5.x | ✅ |
+| Framework Backend | Hono | 4.x | ✅ |
+| Frontend | React | 19.x | ✅ |
+| Build tool | Vite | 5.x | ✅ |
+| Styling | Tailwind CSS | 4.x | ✅ |
+| Router | React Router | 7.x | ✅ |
+| State Management | TanStack React Query | 5.x | ✅ |
+| HTTP Client | Axios | 1.x | ✅ |
+| Markdown Rendering | React Markdown | 9.x | ✅ |
+| Icons | Lucide React | 0.400.x | ✅ |
+| Validación | Zod | 3.x | ✅ |
+| Cloudflare Workers | Wrangler | 3.x | ✅ |
+| Cloudflare Workers Types | @cloudflare/workers-types | 4.x | ✅ |
 
 ---
 
@@ -336,6 +423,7 @@ wrangler secret put [SECRET_NAME] --env [dev/staging]
 
 | Fecha | Cambio | Responsable | Aprobado Por |
 |-------|--------|-------------|--------------|
+| 2026-03-18 | Sprint 4 completado: Frontend React configurado en `src/frontend/`. Estructura de directorios creada (components/, pages/, services/, hooks/, config/, types/, lib/, styles/, public/). Componentes UI implementados (Button, Input, Select, Textarea, Card, Table, Modal, Spinner, Badge, Alert, Form components). Layout components (MainLayout, Sidebar, Header). Projects components (ProjectList, ProjectCard, ProjectForm, ProjectDetail, StatusBadge, ErrorMessage). Results components (ResultsViewer, ReportTab, ReportLoading, ReportError). Páginas creadas (Dashboard, ProjectsPage, CreateProjectPage, ProjectDetailPage, ResultsPage). Servicios API (projectService.ts, workflowService.ts, resultsService.ts). Hooks personalizados (useProjects, useWorkflow, useResults, useApi, useTexts). Configuraciones (texts.ts, errors.ts, validation.ts, navigation.ts, reports.ts). Variables de entorno documentadas (VITE_API_BASE_URL, VITE_PAGES_URL, VITE_CORS_ORIGINS). Archivos de configuración: vite.config.ts, tsconfig.json, tailwind.config.js, .env, .env.production, .env.example. Dependencias agregadas: react 19.x, react-dom 19.x, react-router-dom 7.x, axios 1.x, react-markdown 9.x, zod 3.x, @tanstack/react-query 5.x, lucide-react 0.400.x, tailwindcss 4.x, vite 5.x. Validación typecheck exitosa sin errores de TypeScript | inventariador | Usuario |
 | 2026-03-18 | Sprint 3 completado: Cloudflare Workflow `analysis-workflow` configurado en worker `wk-proceso-inmo`. Archivos creados: `src/workers/workflow/index.ts` (AnalysisWorkflow), `src/workers/workflow/orchestration.ts`, `src/workers/workflow/services/workflow.service.ts`, `src/workers/workflow/services/openai.service.ts`. Integración con OpenAI Responses API implementada (endpoint: https://api.openai.com/v1/responses, modelo: gpt-5.2). Estructura de almacenamiento R2 documentada (9 archivos markdown por proyecto). Bindings del workflow worker: KV (secrets-api-inmo), D1 (db-inmo), R2 (r2-almacen). Validación typecheck exitosa sin errores de TypeScript | inventariador | Usuario |
 | 2026-03-18 | Sprint 1 completado: D1 Database `db-inmo` creada en Cloudflare con ID `871d7b6b-39b0-404b-9066-1ba1a7b8f50a`. Workers `wk-api-inmo` y `wk-proceso-inmo` configurados con bindings en wrangler.toml. Bindings actualizados: `CF_B_KV_SECRETS`, `CF_B_DB-INMO`, `CF_B_R2_INMO` | inventariador | Usuario |
 | 2026-03-18 | Actualización de nombres de recursos: Workers (`wk-api-inmo`, `wk-proceso-inmo`), D1 Database (`db-inmo`), Bindings (`CF_B_KV_SECRETS`, `CF_B_DB_INMO`, `CF_B_R2_INMO`) siguiendo convenciones de nomenclatura | inventariador | Usuario |
