@@ -1,11 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ErrorBoundary from './components/ErrorBoundary';
 import MainLayout from './components/layout/MainLayout';
-import Dashboard from './pages/Dashboard';
-import ProjectsPage from './pages/ProjectsPage';
-import CreateProjectPage from './pages/CreateProjectPage';
-import ProjectDetailPage from './pages/ProjectDetailPage';
-import ResultsPage from './pages/ResultsPage';
+import { Dashboard, ProjectsPage, CreateProjectPage, ProjectDetailPage, ResultsPage, NotFoundPage } from './pages';
 import '@/styles/globals.css';
 
 function App() {
@@ -32,6 +28,7 @@ function App() {
             <Route path="projects/:id" element={<ProjectDetailPage />} />
             <Route path="projects/:id/results" element={<ResultsPage />} />
           </Route>
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
     </ErrorBoundary>
