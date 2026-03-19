@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import type { MainLayoutProps } from '../../types/components';
 import { navigationItems } from '../../config/navigation';
 
 const MainLayout: React.FC<MainLayoutProps> = ({
-  children,
   sidebarCollapsed: externalCollapsed
 }) => {
   const [internalCollapsed, setInternalCollapsed] = useState(false);
@@ -25,13 +24,15 @@ const MainLayout: React.FC<MainLayoutProps> = ({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <Sidebar
-        items={navigationItems}
-        collapsed={sidebarCollapsed}
-        onToggle={handleToggleSidebar}
-        activePath={location.pathname}
-      />
+      {/* Sidebar - Solo desktop */}
+      <div className="hidden lg:block">
+        <Sidebar
+          items={navigationItems}
+          collapsed={sidebarCollapsed}
+          onToggle={handleToggleSidebar}
+          activePath={location.pathname}
+        />
+      </div>
 
       {/* Mobile sidebar overlay */}
       {mobileMenuOpen && (
@@ -57,6 +58,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
 
       {/* Header */}
       <Header
+        sidebarCollapsed={sidebarCollapsed}
         onMenuClick={handleMobileMenuClick}
         onLogout={() => console.log('Logout')}
       />
@@ -69,7 +71,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
         `}
       >
         <div className="p-4 lg:p-6">
-          {children}
+          <Outlet />
         </div>
       </main>
     </div>

@@ -7,13 +7,17 @@ import { uiTexts } from '../../config/texts';
 const Header: React.FC<HeaderProps> = ({
   userName = 'Usuario',
   userAvatar,
+  sidebarCollapsed = false,
   onMenuClick,
   onLogout
 }) => {
   const [showUserMenu, setShowUserMenu] = React.useState(false);
 
   return (
-    <header className="fixed top-0 right-0 left-0 lg:left-16 lg:left-64 h-16 bg-white border-b border-gray-200 z-40 transition-all duration-300">
+    <header className={`
+      fixed top-0 right-0 left-0 h-16 bg-white border-b border-gray-200 z-40 transition-all duration-300
+      ${sidebarCollapsed ? 'lg:left-16' : 'lg:left-64'}
+    `}>
       <div className="flex items-center justify-between h-full px-4 lg:px-6">
         {/* Mobile menu button */}
         <button

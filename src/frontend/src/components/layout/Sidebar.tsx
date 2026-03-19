@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import * as Icons from 'lucide-react';
 import type { SidebarProps, SidebarItem } from '../../types/components';
 import { uiTexts } from '../../config/texts';
@@ -11,7 +11,6 @@ const Sidebar: React.FC<SidebarProps> = ({
   onToggle,
   activePath
 }) => {
-  const location = useLocation();
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
   const toggleExpand = (itemId: string) => {
@@ -32,7 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const renderSidebarItem = (item: SidebarItem, level: number = 0) => {
-    const isActive = activePath === item.path || location.pathname === item.path;
+    const isActive = activePath === item.path;
     const isExpanded = expandedItems.has(item.id);
     const hasChildren = item.children && item.children.length > 0;
 

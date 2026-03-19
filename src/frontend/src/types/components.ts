@@ -26,6 +26,7 @@ export interface SidebarProps {
 export interface HeaderProps {
   userName?: string;
   userAvatar?: string;
+  sidebarCollapsed?: boolean;
   onMenuClick?: () => void;
   onLogout?: () => void;
 }

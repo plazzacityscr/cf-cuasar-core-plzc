@@ -1,37 +1,25 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import ErrorBoundary from './components/ErrorBoundary';
 import MainLayout from './components/layout/MainLayout';
-import { Dashboard, ProjectsPage, CreateProjectPage, ProjectDetailPage, ResultsPage, NotFoundPage } from './pages';
+import { Dashboard, ProjectsPage } from './pages';
 import '@/styles/globals.css';
 
 function App() {
   return (
-    <ErrorBoundary
-      onError={(error, errorInfo) => {
-        // Loggear errores para debugging
-        console.error('[App ErrorBoundary]', error, errorInfo);
-      }}
-    >
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<MainLayout />}>
-            <Route index element={<Dashboard stats={{
-              total: 10,
-              pending: 3,
-              inProgress: 2,
-              completed: 4,
-              failed: 1,
-              cancelled: 0
-            }} />} />
-            <Route path="projects" element={<ProjectsPage />} />
-            <Route path="projects/new" element={<CreateProjectPage />} />
-            <Route path="projects/:id" element={<ProjectDetailPage />} />
-            <Route path="projects/:id/results" element={<ResultsPage />} />
-          </Route>
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </BrowserRouter>
-    </ErrorBoundary>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<Dashboard stats={{
+            total: 10,
+            pending: 3,
+            inProgress: 2,
+            completed: 4,
+            failed: 1,
+            cancelled: 0
+          }} />} />
+          <Route path="projects" element={<ProjectsPage />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
